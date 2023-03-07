@@ -58,7 +58,7 @@ const { assert, expect } = require("chai")
                       const [account, account1] = await ethers.getSigners()
                       await expect(
                           ERC20.connect(account1)._mint(account1.address, 1000)
-                      ).to.be.revertedWithCustomError("ERC20.connect(...)._mint is not a function")
+                      ).to.be.reverted()
                   })
               })
           })
