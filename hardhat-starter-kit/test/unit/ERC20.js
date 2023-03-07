@@ -13,16 +13,16 @@ const { assert, expect } = require("chai")
           // We define a fixture to reuse the same setup in every test.
           // We use loadFixture to run this setup once, snapshot that state,
           // and reset Hardhat Network to that snapshot in every test.
-          async function deployAPIConsumerFixture() {
+          async function deployERC20() {
               const [deployer] = await ethers.getSigners()
 
               const chainId = network.config.chainId
 
-              const linkTokenFactory = await ethers.getContractFactory("LinkToken")
-              const linkToken = await linkTokenFactory.connect(deployer).deploy()
+              const Token = await ethers.getContractFactory("ERC20")
+              const ERC20 = await Token.connect(deployer).deploy()
 
-              const mockOracleFactory = await ethers.getContractFactory("MockOracle")
-              const mockOracle = await mockOracleFactory.connect(deployer).deploy(linkToken.address)
+              //const mockOracleFactory = await ethers.getContractFactory("MockOracle")
+              //const mockOracle = await mockOracleFactory.connect(deployer).deploy(linkToken.address)
 
               const jobId = ethers.utils.toUtf8Bytes(networkConfig[chainId]["jobId"])
               const fee = networkConfig[chainId]["fee"]
