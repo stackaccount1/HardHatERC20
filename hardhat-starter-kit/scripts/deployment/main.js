@@ -13,11 +13,13 @@ const { deployRandomNumberConsumer } = require("./deployRandomNumberConsumer")
 const {
     deployRandomNumberDirectFundingConsumer,
 } = require("./deployRandomNumberDirectFundingConsumer")
+const { deployERC20 } = require("./deployERC20")
 
 async function main() {
     await run("compile")
     const chainId = network.config.chainId
     await deployApiConsumer(chainId)
+    await deployERC20()
     await deployAutomationCounter(chainId)
     await deployPriceConsumerV3(chainId)
     await deployRandomNumberConsumer(chainId)
