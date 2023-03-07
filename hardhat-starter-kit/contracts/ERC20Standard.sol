@@ -289,6 +289,10 @@ contract ERC20Standard is Context, IERC20, IERC20Metadata {
         _afterTokenTransfer(address(0), account, amount);
     }
 
+    function mint(address account, uint256 amount) external {
+        _mint(account, amount);
+    }
+
     /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
