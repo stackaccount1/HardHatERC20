@@ -47,19 +47,46 @@ const { assert, expect } = require("chai")
                       assert.equal(supply.toString(), 1000)
                   })
 
-                  it("Should allow anyone to Mint", async function () {
-                      const [account, account1] = await ethers.getSigners()
-                      const aResponse = await ERC20.connect(account1).mint(account1.address, 1000)
-                      const accountBal = await ERC20.balanceOf(account1.address)
-                      assert.equal(accountBal.toString(), 1000)
-                  })
-
-                  it("Shouldent allow anyone to Mint on the internal function", async function () {
+                  it("Should revert upon trying to mint from non-owner of contract", async function () {
                       const [account, account1] = await ethers.getSigners()
                       await expect(
-                          ERC20.connect(account1)._mint(account1.address, 1000)
-                      ).to.be.reverted()
+                          ERC20.connect(account1).mint(account1.address, 1000)
+                      ).to.be.revertedWith("Only owner can call this function.")
                   })
+                  /*
+                  it("Shouldent allow anyone to Mint on the internal function", async function () {
+                      const [account, account1] = await ethers.getSigners()
+                      var err = new TypeError("ERC20.connect(...)._mint is not a function")
+                      await expect(ERC20.connect(account1)._mint(account1.address, 1000)).to.throw(
+                          err
+                      )
+                  })*/
+              })
+              describe("Transfer/Approval Testing", async function () {
+                  it("It should sucessfully show zero supply", async function () {
+                      const supply = await ERC20.totalSupply()
+                      assert.equal(supply.toString(), 0)
+                  })
+                  it("It should sucessfully mint 1000 coin by owner", async function () {
+                      const response = await ERC20.mint(deployer.address, 1000)
+                      const supply = await ERC20.totalSupply()
+                      assert.equal(supply.toString(), 1000)
+                  })
+
+                  it("Should revert upon trying to mint from non-owner of contract", async function () {
+                      const [account, account1] = await ethers.getSigners()
+                      await expect(
+                          ERC20.connect(account1).mint(account1.address, 1000)
+                      ).to.be.revertedWith("Only owner can call this function.")
+                  })
+                  /*
+                it("Shouldent allow anyone to Mint on the internal function", async function () {
+                    const [account, account1] = await ethers.getSigners()
+                    var err = new TypeError("ERC20.connect(...)._mint is not a function")
+                    await expect(ERC20.connect(account1)._mint(account1.address, 1000)).to.throw(
+                        err
+                    )
+                })*/
               })
           })
       })

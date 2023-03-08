@@ -3,6 +3,7 @@
 
 pragma solidity ^0.8.0;
 
+// 2. Imports
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -33,6 +34,9 @@ import "@openzeppelin/contracts/utils/Context.sol";
  * allowances. See {IERC20-approve}.
  */
 contract ERC20Standard is Context, IERC20, IERC20Metadata {
+    //State Variables
+    address private immutable i_owner;
+
     mapping(address => uint256) private _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -41,6 +45,11 @@ contract ERC20Standard is Context, IERC20, IERC20Metadata {
 
     string private _name;
     string private _symbol;
+
+    modifier onlyOwner() {
+        require(msg.sender == i_owner, "Only owner can call this function.");
+        _;
+    }
 
     /**
      * @dev Sets the values for {name} and {symbol}.
@@ -54,6 +63,7 @@ contract ERC20Standard is Context, IERC20, IERC20Metadata {
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
+        i_owner = msg.sender;
     }
 
     /**
@@ -289,7 +299,7 @@ contract ERC20Standard is Context, IERC20, IERC20Metadata {
         _afterTokenTransfer(address(0), account, amount);
     }
 
-    function mint(address account, uint256 amount) external {
+    function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);
     }
 
