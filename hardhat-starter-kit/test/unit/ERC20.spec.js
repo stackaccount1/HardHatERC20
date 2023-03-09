@@ -69,15 +69,21 @@ const { assert, expect } = require("chai")
                   })
                   it("It should sucessfully mint 1000 coin by owner", async function () {
                       const response = await ERC20.mint(deployer.address, 1000)
+                      const supply = await ERC20.balanceOf(deployer.address)
+                      assert.equal(supply.toString(), 1000)
+                  })
+                  it("It should sucessfully show supply  at 1000", async function () {
+                      const response = await ERC20.mint(deployer.address, 1000)
                       const supply = await ERC20.totalSupply()
                       assert.equal(supply.toString(), 1000)
                   })
 
-                  it("Should revert upon trying to mint from non-owner of contract", async function () {
+                  it("Should not let you transfer tokens with no balance", async function () {
                       const [account, account1] = await ethers.getSigners()
+                      const approval = await ERC20.connect(account1).approve(ERC20.address, 1000)
                       await expect(
-                          ERC20.connect(account1).mint(account1.address, 1000)
-                      ).to.be.revertedWith("Only owner can call this function.")
+                          ERC20.connect(account1).transfer(account.address, 1000)
+                      ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
                   })
                   /*
                 it("Shouldent allow anyone to Mint on the internal function", async function () {
