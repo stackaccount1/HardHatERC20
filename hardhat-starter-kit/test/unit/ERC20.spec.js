@@ -85,6 +85,21 @@ const { assert, expect } = require("chai")
                           ERC20.connect(account1).transfer(account.address, 1000)
                       ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
                   })
+                  it("Should let you transfer tokens", async function () {
+                      const [account, account1] = await ethers.getSigners()
+                      const response = await ERC20.mint(deployer.address, 1000)
+                      //const approval = await ERC20.approve(ERC20.address, 1000)
+                      const trasferCoin = await ERC20.transfer(account1.address, 1000)
+                      const balanceAccount1 = await ERC20.balanceOf(account1.address)
+                      assert.equal(balanceAccount1.toString(), 1000)
+                  })
+                  it("Should revert if no approval has been made", async function () {
+                      const [account, account1] = await ethers.getSigners()
+                      //const approval = await ERC20.connect(account1).approve(ERC20.address, 1000)
+                      await expect(
+                          ERC20.connect(account1).transfer(account.address, 1000)
+                      ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
+                  })
                   /*
                 it("Shouldent allow anyone to Mint on the internal function", async function () {
                     const [account, account1] = await ethers.getSigners()
