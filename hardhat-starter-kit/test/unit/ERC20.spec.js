@@ -53,6 +53,11 @@ const { assert, expect } = require("chai")
                           ERC20.connect(account1).mint(account1.address, 1000)
                       ).to.be.revertedWith("Only owner can call this function.")
                   })
+                  it("It should sucessfully show supply  at 1000", async function () {
+                      const response = await ERC20.mint(deployer.address, 1000)
+                      const supply = await ERC20.totalSupply()
+                      assert.equal(supply.toString(), 1000)
+                  })
                   /*
                   it("Shouldent allow anyone to Mint on the internal function", async function () {
                       const [account, account1] = await ethers.getSigners()
@@ -63,21 +68,6 @@ const { assert, expect } = require("chai")
                   })*/
               })
               describe("Transfer/Approval Testing", async function () {
-                  it("It should sucessfully show zero supply", async function () {
-                      const supply = await ERC20.totalSupply()
-                      assert.equal(supply.toString(), 0)
-                  })
-                  it("It should sucessfully mint 1000 coin by owner", async function () {
-                      const response = await ERC20.mint(deployer.address, 1000)
-                      const supply = await ERC20.balanceOf(deployer.address)
-                      assert.equal(supply.toString(), 1000)
-                  })
-                  it("It should sucessfully show supply  at 1000", async function () {
-                      const response = await ERC20.mint(deployer.address, 1000)
-                      const supply = await ERC20.totalSupply()
-                      assert.equal(supply.toString(), 1000)
-                  })
-
                   it("Should not let you transfer tokens with no balance", async function () {
                       const [account, account1] = await ethers.getSigners()
                       const approval = await ERC20.connect(account1).approve(ERC20.address, 1000)
@@ -93,12 +83,32 @@ const { assert, expect } = require("chai")
                       const balanceAccount1 = await ERC20.balanceOf(account1.address)
                       assert.equal(balanceAccount1.toString(), 1000)
                   })
-                  it("Should revert if no approval has been made", async function () {
-                      const [account, account1] = await ethers.getSigners()
-                      //const approval = await ERC20.connect(account1).approve(ERC20.address, 1000)
+                  it("Let protocol transfer tokens with an approval", async function () {
+                      const [account, account1, account2] = await ethers.getSigners()
+                      const response = await ERC20.mint(deployer.address, 1000)
+                      //const approval = await ERC20.approve(ERC20.address, 1000)
+                      const trasferCoin = await ERC20.transfer(account1.address, 1000)
+                      const approval = await ERC20.connect(account1).approve(account2.address, 1000)
+                      const transfer2 = await ERC20.connect(account2).transferFrom(
+                          account1.address,
+                          account2.address,
+                          1000
+                      )
+                      const balanceAccount2 = await ERC20.balanceOf(account2.address)
+                      assert.equal(balanceAccount2.toString(), 1000)
+                  })
+                  it("Revert transfer tokens with no approval", async function () {
+                      const [account, account1, account2] = await ethers.getSigners()
+                      const response = await ERC20.mint(deployer.address, 1000)
+                      const trasferCoin = await ERC20.transfer(account1.address, 1000)
+                      //const approval = await ERC20.connect(account1).approve(account2.address, 1000)
                       await expect(
-                          ERC20.connect(account1).transfer(account.address, 1000)
-                      ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
+                          ERC20.connect(account2).transferFrom(
+                              account1.address,
+                              account2.address,
+                              1000
+                          )
+                      ).to.be.revertedWith("ERC20: insufficient allowance")
                   })
                   /*
                 it("Shouldent allow anyone to Mint on the internal function", async function () {
