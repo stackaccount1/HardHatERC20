@@ -49,6 +49,8 @@ contract ERC20Reward is Context, IERC20, IERC20Metadata {
 
     mapping(address => mapping(address => uint256)) private _allowances;
 
+    mapping(address => uint256) private _grantedBalances;
+
     uint256 private _totalSupply;
 
     string private _name;
@@ -309,6 +311,25 @@ contract ERC20Reward is Context, IERC20, IERC20Metadata {
 
     function mint(address account, uint256 amount) external onlyOwner {
         _mint(account, amount);
+    }
+
+    function addClaim(address account, uint256 amount) external onlyOwner {
+        _grantedBalances[account] += amount;
+    }
+
+    function mintClaim(uint256 amount) external {
+        require(
+            _grantedBalances[msg.sender] > amount,
+            "mint is higher than claim"
+        );
+        _grantedBalances[msg.sender] -= amount;
+        _mint(msg.sender, amount);
+    }
+
+    function returnClaimBalance(
+        address account
+    ) external view returns (uint256) {
+        return _grantedBalances[account];
     }
 
     /**
